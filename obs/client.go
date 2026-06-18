@@ -34,15 +34,17 @@ func (c *Client) Version() string {
 	return info.ObsVersion
 }
 
-func (c *Client) ListScenes() {
+func (c *Client) ListScenes() []string {
 	list, err := c.conn.Scenes.GetSceneList()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	var names []string
 	for _, scene := range list.Scenes {
-		fmt.Println(scene.SceneName)
+		names = append(names, scene.SceneName)
 	}
+	return names
 }
 
 func (c *Client) SwitchScene(name string) {

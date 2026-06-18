@@ -1,40 +1,56 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
+	"log"
+	"net/http"
 	"os"
+
 	"streaming-dashboard/obs"
 )
 
 func main() {
-	if len(os.Args) < 3 {
-		fmt.Println("Usage: go run . <password> <command> [args]")
-		fmt.Println("Commands: version, scenes, switch <scene name>")
-		return
-	}
+	password := os.Getenv("OBS_PASSWORD")
 
-	password := os.Args[1]
-	command := os.Args[2]
+	if password == "" {
+		log.Fatal("OBS_PASSWORD env var not set")
+	}
 
 	client, err := obs.New(password)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	defer client.Disconnect()
 
-	switch command {
-	case "version":
-		fmt.Println(client.Version())
-	case "scenes":
-		client.ListScenes()
-	case "switch":
-		if len(os.Args) < 4 {
-			fmt.Println("Usage: go run . <password> switch <scene name>")
+	log.Println("Server starting on :8080")
+
+	http.HandleFunc("GET /api/version", func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(map[string]string{
+			"version": client.Version()})
+	})
+
+	http.HandleFunc("GET /api/scenes", func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(map[string][]string{
+			"scenes": client.ListScenes()})
+	})
+
+	http.HandleFunc("POST /api/switch", func(w http.ResponseWriter, r *http.Request) {
+
+		var body struct {
+			Name string `json:"name"`
+		}
+
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			http.Error(w, "bad request", http.StatusBadRequest)
 			return
 		}
-		client.SwitchScene(os.Args[3])
-	default:
-		fmt.Println("Unknown command:", command)
-	}
+
+		client.SwitchScene(body.Name)
+
+		json.NewEncoder(w).Encode(map[string]string{
+			"status": "ok"})
+	})
+
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
