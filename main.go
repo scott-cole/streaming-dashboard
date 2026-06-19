@@ -26,13 +26,30 @@ func main() {
 	log.Println("Server starting on :8080")
 
 	http.HandleFunc("GET /api/version", func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(map[string]string{
-			"version": client.Version()})
+		version, err := client.Version()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		json.NewEncoder(w).Encode(map[string]string{"version": version})
 	})
 
 	http.HandleFunc("GET /api/scenes", func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(map[string][]string{
-			"scenes": client.ListScenes()})
+		scenes, err := client.ListScenes()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		json.NewEncoder(w).Encode(map[string][]string{"scenes": scenes})
+	})
+
+	http.HandleFunc("GET /api/current-scene", func(w http.ResponseWriter, r *http.Request) {
+		scene, err := client.CurrentScene()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		json.NewEncoder(w).Encode(map[string]string{"scene": scene})
 	})
 
 	http.HandleFunc("POST /api/switch", func(w http.ResponseWriter, r *http.Request) {
@@ -46,10 +63,12 @@ func main() {
 			return
 		}
 
-		client.SwitchScene(body.Name)
+		if err := client.SwitchScene(body.Name); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
-		json.NewEncoder(w).Encode(map[string]string{
-			"status": "ok"})
+		json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
 	})
 
 	log.Fatal(http.ListenAndServe(":8080", nil))

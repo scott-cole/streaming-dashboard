@@ -2,7 +2,6 @@ package obs
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/andreykaipov/goobs"
 	"github.com/andreykaipov/goobs/api/requests/scenes"
@@ -25,32 +24,42 @@ func (c *Client) Disconnect() {
 	c.conn.Disconnect()
 }
 
-func (c *Client) Version() string {
+func (c *Client) Version() (string, error) {
 	info, err := c.conn.General.GetVersion()
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 
-	return info.ObsVersion
+	return info.ObsVersion, nil
 }
 
-func (c *Client) ListScenes() []string {
+func (c *Client) CurrentScene() (string, error) {
+	scene, err := c.conn.Scenes.GetCurrentProgramScene()
+	if err != nil {
+		return "", err
+	}
+
+	return scene.SceneName, nil
+}
+
+func (c *Client) ListScenes() ([]string, error) {
 	list, err := c.conn.Scenes.GetSceneList()
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	var names []string
 	for _, scene := range list.Scenes {
 		names = append(names, scene.SceneName)
 	}
-	return names
+	return names, nil
 }
 
-func (c *Client) SwitchScene(name string) {
+func (c *Client) SwitchScene(name string) error {
 	_, err := c.conn.Scenes.SetCurrentProgramScene(scenes.NewSetCurrentProgramSceneParams().WithSceneName(name))
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	fmt.Println("Switched to:", name)
+	return nil
 }
