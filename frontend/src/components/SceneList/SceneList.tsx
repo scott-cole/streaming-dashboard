@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
-import Button from "../Button/Button";
+import styles from "./SceneList.module.scss";
 
-function SceneList() {
+interface SceneListProps {
+  onSceneChange: (scene: string) => void;
+}
+
+function SceneList({ onSceneChange }: SceneListProps) {
   const [scenes, setScenes] = useState<string[]>([]);
   const [currentScene, setCurrentScene] = useState<string>("");
   const [loading, setLoading] = useState(true);
@@ -11,20 +15,17 @@ function SceneList() {
     const fetchScenes = async () => {
       try {
         const res = await fetch("/api/scenes");
-        if (!res.ok) {
-          throw new Error("Failed to fetch scenes");
-        }
+        if (!res.ok) throw new Error("Failed to fetch scenes");
 
         const currentRes = await fetch("/api/current-scene");
-        if (!currentRes.ok) {
-          throw new Error("Failed to fetch current scene");
-        }
+        if (!currentRes.ok) throw new Error("Failed to fetch current scene");
 
         const data = await res.json();
         const currentData = await currentRes.json();
 
         setScenes(data.scenes);
         setCurrentScene(currentData.scene);
+        onSceneChange(currentData.scene);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown Error");
       } finally {
@@ -33,7 +34,7 @@ function SceneList() {
     };
 
     fetchScenes();
-  }, []);
+  }, [onSceneChange]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -45,23 +46,34 @@ function SceneList() {
       body: JSON.stringify({ name }),
     });
     setCurrentScene(name);
+    onSceneChange(name);
   };
 
   return (
-    <>
-      <ul>
+    <div>
+      <div style={{
+        fontSize: "var(--font-xs)",
+        fontWeight: 600,
+        color: "var(--text-muted)",
+        textTransform: "uppercase",
+        letterSpacing: "0.05em",
+        marginBottom: 12,
+      }}>
+        Scenes
+      </div>
+      <div className={styles.list}>
         {scenes.map((scene) => (
-          <li key={scene}>
-            <Button
-              variant={scene === currentScene ? "primary" : "secondary"}
-              onClick={() => switchScene(scene)}
-            >
-              {scene}
-            </Button>
-          </li>
+          <button
+            key={scene}
+            className={`${styles.scene} ${scene === currentScene ? styles.active : ""}`}
+            onClick={() => switchScene(scene)}
+          >
+            <span className={`${styles.indicator} ${scene === currentScene ? styles.indicatorActive : ""}`} />
+            {scene}
+          </button>
         ))}
-      </ul>
-    </>
+      </div>
+    </div>
   );
 }
 

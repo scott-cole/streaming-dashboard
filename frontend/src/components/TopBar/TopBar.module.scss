@@ -1,0 +1,146 @@
+.topbar {
+  height: var(--topbar-height);
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--border-primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--main-padding);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.search {
+  position: relative;
+  width: 320px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: var(--font-sm);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 14px 10px 36px;
+  background: var(--color-surface);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: var(--font-sm);
+  font-family: var(--font-family);
+  outline: none;
+  transition: border-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  &::placeholder {
+    color: var(--text-muted);
+  }
+
+  &:focus {
+    border-color: var(--border-focus);
+  }
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.offline {
+  background: rgba(255,255,255,0.04);
+  color: var(--text-muted);
+  border: 1px solid var(--border-primary);
+}
+
+.live {
+  background: rgba(0,230,118,0.12);
+  color: var(--success);
+  border: 1px solid rgba(0,230,118,0.25);
+}
+
+.recording {
+  background: rgba(255,90,110,0.12);
+  color: var(--danger);
+  border: 1px solid rgba(255,90,110,0.25);
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+
+  .offline & {
+    background: var(--text-disabled);
+  }
+
+  .live & {
+    background: var(--success);
+    box-shadow: 0 0 8px rgba(0,230,118,0.5);
+  }
+
+  .recording & {
+    background: var(--danger);
+    box-shadow: 0 0 8px rgba(255,90,110,0.5);
+  }
+}
+
+.statusText {
+  .live & {
+    animation: pulse 2s ease-in-out infinite;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.goLive {
+  padding: 8px 20px;
+  border-radius: var(--radius-btn);
+  background: linear-gradient(135deg, #00C8FF, #009BFF);
+  color: #ffffff;
+  font-size: var(--font-sm);
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 20px var(--glow-primary);
+
+  &:hover {
+    filter: brightness(1.1);
+  }
+}
+
+.profileIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-active));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+}

@@ -1,0 +1,73 @@
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.output {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: var(--color-surface);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  text-align: left;
+
+  &:hover:not(:disabled) {
+    background: var(--color-surface-hover);
+    border-color: var(--border-primary);
+  }
+}
+
+.record:hover:not(:disabled) {
+  border-color: rgba(255,90,110,0.25);
+}
+
+.active {
+  &.output:not(.record) {
+    background: rgba(0,200,255,0.12);
+    border-color: var(--border-focus);
+    box-shadow: inset 3px 0 0 0 var(--color-primary);
+  }
+
+  &.record {
+    background: rgba(255,90,110,0.12);
+    border-color: rgba(255,90,110,0.25);
+    box-shadow: inset 3px 0 0 0 var(--danger);
+  }
+}
+
+.outputLabel {
+  flex: 1;
+}
+
+.outputDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--text-disabled);
+  flex-shrink: 0;
+
+  .active & {
+    background: var(--color-primary);
+    box-shadow: 0 0 8px var(--glow-primary);
+  }
+
+  .active.record & {
+    background: var(--danger);
+    box-shadow: 0 0 8px rgba(255,90,110,0.5);
+  }
+}
+
+.output:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
